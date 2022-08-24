@@ -25,8 +25,9 @@ security:
             jwt: ~
 
     access_control:
-        - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api,       roles: PUBLIC_ACCESS }
+        - { path: ^/api/login,  roles: PUBLIC_ACCESS }
+        - { path: ^/admin,      roles: ADMIN_ACCESS }
+        - { path: ^/api,        roles: PUBLIC_ACCESS }
 when@test:
     security:
         password_hashers:
