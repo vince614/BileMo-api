@@ -4,37 +4,17 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Action\NotFoundAction;
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Controller\MeController;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\User\JWTUserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[ApiResource(
-    collectionOperations: [],
-    itemOperations: [
-        'get' => [
-            'controller' => NotFoundAction::class,
-            'openapi_context' => ['summary' => 'hidden'],
-            'read' => false,
-            'output' => false
-        ],
-        'me' => [
-            'pagination_enable' => false,
-            'path' => '/me',
-            'method' => 'post',
-            'controller' => MeController::class,
-            'read' => false,
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]]
-            ]
-        ],
-    ],
-    normalizationContext: ['groups' => ['read:User']],
-    security: 'is_granted("ROLE_USER")'
-)]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+#[ApiResource]
+class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -136,5 +116,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->username = $username;
 
         return $this;
+    }
+
+    public static function createFromPayload($username, array $payload)
+    {
+        dd($username);
+        // TODO: Implement createFromPayload() method.
     }
 }

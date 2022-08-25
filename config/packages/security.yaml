@@ -12,18 +12,22 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+        jwt:
+            lexik_jwt: ~
     firewalls:
         dev:
-            pattern: ^/_(profiler|wdt)
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
         api:
             pattern: ^/api/
             stateless: true
-            provider: app_user_provider
+            provider: jwt
             jwt: ~
 
         main:
+            stateless: true
+            provider: app_user_provider
             json_login:
                 check_path: /authentication_token
                 username_path: email
@@ -33,9 +37,9 @@ security:
             jwt: ~
 
     access_control:
-        - { path: ^/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
+        - { path: ^/api, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
+        - { path: ^/api/^, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/authentication_token, roles: PUBLIC_ACCESS }
-        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
 when@test:
     security:
         password_hashers:
