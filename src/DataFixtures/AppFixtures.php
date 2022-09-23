@@ -2,8 +2,10 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Client;
 use App\Entity\Product;
 use App\Entity\User;
+use App\Repository\ClientRepository;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -59,7 +61,10 @@ class AppFixtures extends Fixture
      *
      * @param UserPasswordHasherInterface $passwordHasher
      */
-    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher)
+    public function __construct(
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly ClientRepository $clientRepository
+    )
     {
 
     }
@@ -75,8 +80,8 @@ class AppFixtures extends Fixture
         $this->_faker = Factory::create('fr_FR');
 
         // Creates entities
+        $this->_createClients();
         $this->_createUsers();
-        $this->_createAdminUsers();
         $this->_createProducts();
 
         // Flush
@@ -93,14 +98,15 @@ class AppFixtures extends Fixture
     {
         $userCount = random_int(1, self::USERS_MAX_COUNT);
         $this->log("Create $userCount users");
+        $client = $this->clientRepository->findOneBy(['email' => 'admin@bilemo.com']);
         for ($i = 0; $i < $userCount; $i++) {
             $user = new User();
             $username = $this->_faker->userName;
             $user
                 ->setUsername($username)
                 ->setEmail($this->_faker->email)
-                ->setPassword($this->passwordHasher->hashPassword($user, $this->_faker->password))
-                ->setRoles(['ROLE_USER']);
+                ->setClient($client)
+                ->setPassword($this->passwordHasher->hashPassword($user, $this->_faker->password));
             $this->log('[USER] ' . $username . ' was created', 'green');
             $this->manager->persist($user);
         }
@@ -111,25 +117,18 @@ class AppFixtures extends Fixture
      *
      * @return void
      */
-    private function _createAdminUsers(): void
+    private function _createClients(): void
     {
-        $this->log("Create 2 admins users");
-        $admin_user = new User();
-        $admin_user
+        $this->log("Create 2 clients");
+        $client = new Client();
+        $client
             ->setEmail('admin@bilemo.com')
-            ->setPassword($this->passwordHasher->hashPassword($admin_user, 'admin'))
-            ->setRoles(['ROLE_SUPER_ADMIN'])
-            ->setUsername('admin');
-        $this->manager->persist($admin_user);
-        $this->log('[USER] admin was created', 'green');
-        $classic_user = new User();
-        $classic_user
-            ->setEmail('user@bilemo.com')
-            ->setPassword($this->passwordHasher->hashPassword($admin_user, 'user'))
-            ->setRoles(['ROLE_USER'])
-            ->setUsername('user');
-        $this->manager->persist($classic_user);
-        $this->log('[USER] user was created', 'green');
+            ->setPassword($this->passwordHasher->hashPassword($client, 'admin'))
+            ->setRoles(['ROLE_ADMIN'])
+            ->setName('admin');
+        $this->manager->persist($client);
+        $this->manager->flush();
+        $this->log('[CLIENT] admin was created', 'green');
     }
 
     /**

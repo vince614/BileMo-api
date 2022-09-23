@@ -2,15 +2,16 @@ security:
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         App\Entity\User: 'auto'
+        App\Entity\Client: 'auto'
 
     # https://symfony.com/doc/current/security/authenticator_manager.html
     enable_authenticator_manager: true
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
         # used to reload user from session & other features (e.g. switch_user)
-        app_user_provider:
+        app_client_provider:
             entity:
-                class: App\Entity\User
+                class: App\Entity\Client
                 property: email
         jwt:
             lexik_jwt: ~
@@ -27,7 +28,7 @@ security:
 
         main:
             stateless: true
-            provider: app_user_provider
+            provider: app_client_provider
             json_login:
                 check_path: /authentication_token
                 username_path: email
