@@ -41,6 +41,11 @@ security:
         - { path: ^/api, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/api/^, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/authentication_token, roles: PUBLIC_ACCESS }
+
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_ADMIN
+        ROLE_USER : [ ROLE_USER, PUBLIC_ACCESS ]
+
 when@test:
     security:
         password_hashers:
