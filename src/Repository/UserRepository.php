@@ -56,6 +56,42 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->add($user, true);
     }
 
+    /**
+     * Find users by client id
+     *
+     * @param $clientId
+     * @return array
+     */
+    public function findAllByClientId($clientId): array
+    {
+        return $this->createQueryBuilder('u')
+            ->select(['u.id', 'u.email', 'u.username'])
+            ->andWhere('u.client = :val')
+            ->setParameter('val', $clientId)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
+     * @param $clientId
+     * @param $userId
+     * @return float|int|mixed|string
+     */
+    public function findByCliendId($clientId, $userId): mixed
+    {
+        return $this->createQueryBuilder('u')
+            ->select(['u.id', 'u.email', 'u.username'])
+            ->andWhere('u.client = :val')
+            ->andWhere('u.id = :userId')
+            ->setParameter('val', $clientId)
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */

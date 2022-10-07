@@ -5,29 +5,55 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations: [
+        'get' => [
+            'normalization_context' => [
+                'groups' => 'product:list',
+            ],
+        ]
+    ],
+    itemOperations: [
+        'get' => [
+            'normalization_context' => [
+                'groups' => 'product:item'
+            ]
+        ]
+    ],
+    shortName: 'Produits',
+    order: ['created_at' => 'DESC'],
+    paginationEnabled: true,
+    paginationItemsPerPage: 10
+)]
 class Product
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['product:list', 'product:item'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['product:list', 'product:item'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['product:list', 'product:item'])]
     private ?string $sku = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['product:list', 'product:item'])]
     private ?string $image = null;
 
     #[ORM\Column(type: 'text')]
+    #[Groups(['product:list', 'product:item'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['product:list', 'product:item'])]
     private ?\DateTimeImmutable $created_at = null;
 
     public function getId(): ?int
